@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState } from "react";
 import { Check, Minus, Plus, Star, Truck, ShieldCheck, ChevronRight } from "lucide-react";
-import { getProduct, products } from "@/lib/products";
+import { getProduct, products, type Product } from "@/lib/products";
 import { ProductCard } from "@/components/ProductCard";
 import { useCart } from "@/contexts/CartContext";
 
