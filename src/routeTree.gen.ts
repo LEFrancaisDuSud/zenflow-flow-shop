@@ -9,21 +9,45 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as PanierRouteImport } from './routes/panier'
+import { Route as MentionsLegalesRouteImport } from './routes/mentions-legales'
+import { Route as LivraisonRetoursRouteImport } from './routes/livraison-retours'
+import { Route as FaqRouteImport } from './routes/faq'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as ConfidentialiteRouteImport } from './routes/confidentialite'
+import { Route as CgvRouteImport } from './routes/cgv'
 import { Route as AProposRouteImport } from './routes/a-propos'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as BoutiqueIndexRouteImport } from './routes/boutique.index'
 import { Route as BoutiqueSlugRouteImport } from './routes/boutique.$slug'
 
-const PanierRoute = PanierRouteImport.update({
-  id: '/panier',
-  path: '/panier',
+const MentionsLegalesRoute = MentionsLegalesRouteImport.update({
+  id: '/mentions-legales',
+  path: '/mentions-legales',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LivraisonRetoursRoute = LivraisonRetoursRouteImport.update({
+  id: '/livraison-retours',
+  path: '/livraison-retours',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConfidentialiteRoute = ConfidentialiteRouteImport.update({
+  id: '/confidentialite',
+  path: '/confidentialite',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CgvRoute = CgvRouteImport.update({
+  id: '/cgv',
+  path: '/cgv',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AProposRoute = AProposRouteImport.update({
@@ -50,16 +74,24 @@ const BoutiqueSlugRoute = BoutiqueSlugRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/a-propos': typeof AProposRoute
+  '/cgv': typeof CgvRoute
+  '/confidentialite': typeof ConfidentialiteRoute
   '/contact': typeof ContactRoute
-  '/panier': typeof PanierRoute
+  '/faq': typeof FaqRoute
+  '/livraison-retours': typeof LivraisonRetoursRoute
+  '/mentions-legales': typeof MentionsLegalesRoute
   '/boutique/$slug': typeof BoutiqueSlugRoute
   '/boutique/': typeof BoutiqueIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/a-propos': typeof AProposRoute
+  '/cgv': typeof CgvRoute
+  '/confidentialite': typeof ConfidentialiteRoute
   '/contact': typeof ContactRoute
-  '/panier': typeof PanierRoute
+  '/faq': typeof FaqRoute
+  '/livraison-retours': typeof LivraisonRetoursRoute
+  '/mentions-legales': typeof MentionsLegalesRoute
   '/boutique/$slug': typeof BoutiqueSlugRoute
   '/boutique': typeof BoutiqueIndexRoute
 }
@@ -67,8 +99,12 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/a-propos': typeof AProposRoute
+  '/cgv': typeof CgvRoute
+  '/confidentialite': typeof ConfidentialiteRoute
   '/contact': typeof ContactRoute
-  '/panier': typeof PanierRoute
+  '/faq': typeof FaqRoute
+  '/livraison-retours': typeof LivraisonRetoursRoute
+  '/mentions-legales': typeof MentionsLegalesRoute
   '/boutique/$slug': typeof BoutiqueSlugRoute
   '/boutique/': typeof BoutiqueIndexRoute
 }
@@ -77,24 +113,36 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/a-propos'
+    | '/cgv'
+    | '/confidentialite'
     | '/contact'
-    | '/panier'
+    | '/faq'
+    | '/livraison-retours'
+    | '/mentions-legales'
     | '/boutique/$slug'
     | '/boutique/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/a-propos'
+    | '/cgv'
+    | '/confidentialite'
     | '/contact'
-    | '/panier'
+    | '/faq'
+    | '/livraison-retours'
+    | '/mentions-legales'
     | '/boutique/$slug'
     | '/boutique'
   id:
     | '__root__'
     | '/'
     | '/a-propos'
+    | '/cgv'
+    | '/confidentialite'
     | '/contact'
-    | '/panier'
+    | '/faq'
+    | '/livraison-retours'
+    | '/mentions-legales'
     | '/boutique/$slug'
     | '/boutique/'
   fileRoutesById: FileRoutesById
@@ -102,19 +150,37 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AProposRoute: typeof AProposRoute
+  CgvRoute: typeof CgvRoute
+  ConfidentialiteRoute: typeof ConfidentialiteRoute
   ContactRoute: typeof ContactRoute
-  PanierRoute: typeof PanierRoute
+  FaqRoute: typeof FaqRoute
+  LivraisonRetoursRoute: typeof LivraisonRetoursRoute
+  MentionsLegalesRoute: typeof MentionsLegalesRoute
   BoutiqueSlugRoute: typeof BoutiqueSlugRoute
   BoutiqueIndexRoute: typeof BoutiqueIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/panier': {
-      id: '/panier'
-      path: '/panier'
-      fullPath: '/panier'
-      preLoaderRoute: typeof PanierRouteImport
+    '/mentions-legales': {
+      id: '/mentions-legales'
+      path: '/mentions-legales'
+      fullPath: '/mentions-legales'
+      preLoaderRoute: typeof MentionsLegalesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/livraison-retours': {
+      id: '/livraison-retours'
+      path: '/livraison-retours'
+      fullPath: '/livraison-retours'
+      preLoaderRoute: typeof LivraisonRetoursRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -122,6 +188,20 @@ declare module '@tanstack/react-router' {
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/confidentialite': {
+      id: '/confidentialite'
+      path: '/confidentialite'
+      fullPath: '/confidentialite'
+      preLoaderRoute: typeof ConfidentialiteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cgv': {
+      id: '/cgv'
+      path: '/cgv'
+      fullPath: '/cgv'
+      preLoaderRoute: typeof CgvRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/a-propos': {
@@ -158,8 +238,12 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AProposRoute: AProposRoute,
+  CgvRoute: CgvRoute,
+  ConfidentialiteRoute: ConfidentialiteRoute,
   ContactRoute: ContactRoute,
-  PanierRoute: PanierRoute,
+  FaqRoute: FaqRoute,
+  LivraisonRetoursRoute: LivraisonRetoursRoute,
+  MentionsLegalesRoute: MentionsLegalesRoute,
   BoutiqueSlugRoute: BoutiqueSlugRoute,
   BoutiqueIndexRoute: BoutiqueIndexRoute,
 }
