@@ -1,54 +1,96 @@
 import { Link } from "@tanstack/react-router";
-import { Star } from "lucide-react";
-import type { Product } from "@/lib/products";
-import { useCart } from "@/contexts/CartContext";
+import { Loader2, Plus } from "lucide-react";
+import { useState } from "react";
+import type { ShopifyProduct } from "@/lib/shopify";
+import { useCartStore } from "@/stores/cartStore";
 
-export function ProductCard({ product }: { product: Product }) {
-  const { addItem } = useCart();
-  const discount = Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100);
+function formatPrice(amount: string, currency: string) {
+  return new Intl.NumberFormat("fr-FR", { style: "currency", currency, maximumFractionDigits: 0 }).format(
+    parseFloat(amount)
+  );
+}
+
+export function ProductCard({ product }: { product: ShopifyProduct }) {
+  const node = product.node;
+  const variant = node.variants.edges[0]?.node;
+  const image = node.images.edges[0]?.node;
+  const addItem = useCartStore((s) => s.addItem);
+  const [adding, setAdding] = useState(false);
+
+  const price = variant?.price ?? node.priceRange.minVariantPrice;
+  const compareAt = variant?.compareAtPrice ?? node.compareAtPriceRange?.minVariantPrice ?? null;
+  const discount =
+    compareAt && parseFloat(compareAt.amount) > parseFloat(price.amount)
+      ? Math.round(
+          ((parseFloat(compareAt.amount) - parseFloat(price.amount)) / parseFloat(compareAt.amount)) * 100
+        )
+      : 0;
+
+  const handleAdd = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!variant || adding) return;
+    setAdding(true);
+    await addItem({
+      variantId: variant.id,
+      productHandle: node.handle,
+      productTitle: node.title,
+      variantTitle: variant.title,
+      image: image?.url ?? null,
+      price: variant.price,
+      quantity: 1,
+      selectedOptions: variant.selectedOptions || [],
+    });
+    setAdding(false);
+  };
 
   return (
     <div className="group relative flex flex-col">
       <Link
         to="/boutique/$slug"
-        params={{ slug: product.slug }}
+        params={{ slug: node.handle }}
         className="relative block aspect-square overflow-hidden rounded-2xl bg-muted"
       >
-        <img
-          src={product.image}
-          alt={product.name}
-          loading="lazy"
-          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-        />
+        {image && (
+          <img
+            src={image.url}
+            alt={image.altText ?? node.title}
+            loading="lazy"
+            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+          />
+        )}
         {discount > 0 && (
           <span className="absolute left-3 top-3 rounded-full bg-gold px-2.5 py-1 text-xs font-semibold text-gold-foreground">
             -{discount}%
           </span>
         )}
-        <div className="absolute inset-x-3 bottom-3 translate-y-3 opacity-0 transition group-hover:translate-y-0 group-hover:opacity-100">
-          <button
-            onClick={(e) => { e.preventDefault(); addItem(product); }}
-            className="w-full rounded-full bg-foreground/95 px-4 py-2.5 text-sm font-medium text-background backdrop-blur hover:bg-foreground"
-          >
-            + Ajouter au panier
-          </button>
-        </div>
+        <button
+          onClick={handleAdd}
+          disabled={adding || !variant?.availableForSale}
+          aria-label="Ajouter au panier"
+          className="absolute bottom-3 right-3 inline-flex h-10 w-10 items-center justify-center rounded-full bg-foreground text-background shadow-lg transition hover:bg-primary disabled:opacity-60 md:opacity-0 md:translate-y-2 md:group-hover:opacity-100 md:group-hover:translate-y-0"
+        >
+          {adding ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />}
+        </button>
       </Link>
 
-      <div className="mt-4 flex flex-col gap-1.5">
-        <span className="text-xs uppercase tracking-wider text-muted-foreground">{product.category}</span>
-        <Link to="/boutique/$slug" params={{ slug: product.slug }} className="font-medium leading-snug hover:text-primary">
-          {product.name}
+      <div className="mt-4 flex flex-col gap-1">
+        <span className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
+          {node.productType || node.vendor}
+        </span>
+        <Link
+          to="/boutique/$slug"
+          params={{ slug: node.handle }}
+          className="font-medium leading-snug hover:text-primary line-clamp-2"
+        >
+          {node.title}
         </Link>
-        <div className="flex items-center gap-1 text-xs text-muted-foreground">
-          <Star size={12} className="fill-gold text-gold" />
-          <span>{product.rating}</span>
-          <span>·</span>
-          <span>{product.reviews} avis</span>
-        </div>
         <div className="mt-1 flex items-baseline gap-2">
-          <span className="text-lg font-semibold">{product.price}€</span>
-          <span className="text-sm text-muted-foreground line-through">{product.oldPrice}€</span>
+          <span className="text-lg font-semibold">{formatPrice(price.amount, price.currencyCode)}</span>
+          {compareAt && parseFloat(compareAt.amount) > parseFloat(price.amount) && (
+            <span className="text-sm text-muted-foreground line-through">
+              {formatPrice(compareAt.amount, compareAt.currencyCode)}
+            </span>
+          )}
         </div>
       </div>
     </div>
