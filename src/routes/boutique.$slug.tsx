@@ -34,7 +34,7 @@ export const Route = createFileRoute("/boutique/$slug")({
 });
 
 function ProductDetail() {
-  const product = Route.useLoaderData();
+  const product = Route.useLoaderData() as ReturnType<typeof getProduct> & {};
   const { addItem } = useCart();
   const [activeImg, setActiveImg] = useState(product.images[0]);
   const [qty, setQty] = useState(1);
