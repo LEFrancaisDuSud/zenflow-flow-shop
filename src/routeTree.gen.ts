@@ -9,18 +9,12 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as PanierRouteImport } from './routes/panier'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AProposRouteImport } from './routes/a-propos'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as BoutiqueIndexRouteImport } from './routes/boutique.index'
 import { Route as BoutiqueSlugRouteImport } from './routes/boutique.$slug'
 
-const PanierRoute = PanierRouteImport.update({
-  id: '/panier',
-  path: '/panier',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
@@ -51,7 +45,6 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/a-propos': typeof AProposRoute
   '/contact': typeof ContactRoute
-  '/panier': typeof PanierRoute
   '/boutique/$slug': typeof BoutiqueSlugRoute
   '/boutique/': typeof BoutiqueIndexRoute
 }
@@ -59,7 +52,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/a-propos': typeof AProposRoute
   '/contact': typeof ContactRoute
-  '/panier': typeof PanierRoute
   '/boutique/$slug': typeof BoutiqueSlugRoute
   '/boutique': typeof BoutiqueIndexRoute
 }
@@ -68,33 +60,19 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/a-propos': typeof AProposRoute
   '/contact': typeof ContactRoute
-  '/panier': typeof PanierRoute
   '/boutique/$slug': typeof BoutiqueSlugRoute
   '/boutique/': typeof BoutiqueIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/a-propos'
-    | '/contact'
-    | '/panier'
-    | '/boutique/$slug'
-    | '/boutique/'
+  fullPaths: '/' | '/a-propos' | '/contact' | '/boutique/$slug' | '/boutique/'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/a-propos'
-    | '/contact'
-    | '/panier'
-    | '/boutique/$slug'
-    | '/boutique'
+  to: '/' | '/a-propos' | '/contact' | '/boutique/$slug' | '/boutique'
   id:
     | '__root__'
     | '/'
     | '/a-propos'
     | '/contact'
-    | '/panier'
     | '/boutique/$slug'
     | '/boutique/'
   fileRoutesById: FileRoutesById
@@ -103,20 +81,12 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AProposRoute: typeof AProposRoute
   ContactRoute: typeof ContactRoute
-  PanierRoute: typeof PanierRoute
   BoutiqueSlugRoute: typeof BoutiqueSlugRoute
   BoutiqueIndexRoute: typeof BoutiqueIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/panier': {
-      id: '/panier'
-      path: '/panier'
-      fullPath: '/panier'
-      preLoaderRoute: typeof PanierRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/contact': {
       id: '/contact'
       path: '/contact'
@@ -159,7 +129,6 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AProposRoute: AProposRoute,
   ContactRoute: ContactRoute,
-  PanierRoute: PanierRoute,
   BoutiqueSlugRoute: BoutiqueSlugRoute,
   BoutiqueIndexRoute: BoutiqueIndexRoute,
 }

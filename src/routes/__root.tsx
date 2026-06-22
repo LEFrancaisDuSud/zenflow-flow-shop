@@ -8,13 +8,14 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
+import { Toaster } from "sonner";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
-import { CartProvider } from "@/contexts/CartContext";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { CartDrawer } from "@/components/CartDrawer";
+import { useCartSync } from "@/hooks/useCartSync";
 
 function NotFoundComponent() {
   return (
@@ -79,18 +80,24 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+function AppBody() {
+  useCartSync();
+  return (
+    <div className="flex min-h-screen flex-col">
+      <Header />
+      <main className="flex-1"><Outlet /></main>
+      <Footer />
+      <CartDrawer />
+      <Toaster position="top-center" richColors />
+    </div>
+  );
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   return (
     <QueryClientProvider client={queryClient}>
-      <CartProvider>
-        <div className="flex min-h-screen flex-col">
-          <Header />
-          <main className="flex-1"><Outlet /></main>
-          <Footer />
-        </div>
-        <CartDrawer />
-      </CartProvider>
+      <AppBody />
     </QueryClientProvider>
   );
 }

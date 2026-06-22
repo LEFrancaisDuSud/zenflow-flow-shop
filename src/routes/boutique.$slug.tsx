@@ -1,28 +1,23 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { Check, Minus, Plus, Star, Truck, ShieldCheck, ChevronRight } from "lucide-react";
-import { getProduct, products, type Product } from "@/lib/products";
+import { Check, ChevronRight, Loader2, Minus, Plus, ShieldCheck, Truck } from "lucide-react";
 import { ProductCard } from "@/components/ProductCard";
-import { useCart } from "@/contexts/CartContext";
+import { productByHandleQueryOptions, productsQueryOptions } from "@/lib/productQueries";
+import { useCartStore } from "@/stores/cartStore";
 
 export const Route = createFileRoute("/boutique/$slug")({
-  head: ({ params }) => {
-    const p = getProduct(params.slug);
-    return {
-      meta: [
-        { title: p ? `${p.name} — ZenFlow` : "Produit — ZenFlow" },
-        { name: "description", content: p?.description.slice(0, 155) ?? "Découvrez ce produit ZenFlow." },
-        { property: "og:title", content: p?.name ?? "ZenFlow" },
-        { property: "og:description", content: p?.description.slice(0, 155) ?? "" },
-        { property: "og:image", content: p?.image ?? "" },
-        { name: "twitter:image", content: p?.image ?? "" },
-      ],
-    };
-  },
-  loader: ({ params }) => {
-    const p = getProduct(params.slug);
-    if (!p) throw notFound();
-    return p;
+  head: ({ params }) => ({
+    meta: [
+      { title: `${params.slug.replace(/-/g, " ")} — ZenFlow` },
+      { name: "description", content: "Découvrez ce produit ZenFlow, pensé pour libérer votre corps." },
+    ],
+  }),
+  loader: async ({ params, context }) => {
+    await Promise.all([
+      context.queryClient.ensureQueryData(productByHandleQueryOptions(params.slug)),
+      context.queryClient.ensureQueryData(productsQueryOptions()),
+    ]);
   },
   component: ProductDetail,
   notFoundComponent: () => (
@@ -33,139 +28,160 @@ export const Route = createFileRoute("/boutique/$slug")({
   ),
 });
 
-function ProductDetail() {
-  const product = Route.useLoaderData() as Product;
-  const { addItem } = useCart();
-  const [activeImg, setActiveImg] = useState(product.images[0]);
-  const [qty, setQty] = useState(1);
-  const [tab, setTab] = useState<"desc" | "spec" | "ship">("desc");
+function formatPrice(amount: string, currency: string) {
+  return new Intl.NumberFormat("fr-FR", { style: "currency", currency, maximumFractionDigits: 0 }).format(parseFloat(amount));
+}
 
-  const discount = Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100);
-  const related = products.filter((p) => p.id !== product.id && p.category === product.category).slice(0, 3);
-  const fallbackRelated = related.length >= 3 ? related : [...related, ...products.filter((p) => p.id !== product.id && !related.includes(p))].slice(0, 3);
+function ProductDetail() {
+  const { slug } = Route.useParams();
+  const { data: product } = useSuspenseQuery(productByHandleQueryOptions(slug));
+  const { data: all } = useSuspenseQuery(productsQueryOptions());
+
+  if (!product) throw notFound();
+
+  const variant = product.variants.edges[0]?.node;
+  const images = product.images.edges.map((e) => e.node);
+  const [activeImg, setActiveImg] = useState(images[0]?.url);
+  const [qty, setQty] = useState(1);
+  const [adding, setAdding] = useState(false);
+  const [tab, setTab] = useState<"desc" | "ship">("desc");
+  const addItem = useCartStore((s) => s.addItem);
+
+  const price = variant?.price ?? product.priceRange.minVariantPrice;
+  const compareAt = variant?.compareAtPrice ?? null;
+  const discount = compareAt && parseFloat(compareAt.amount) > parseFloat(price.amount)
+    ? Math.round(((parseFloat(compareAt.amount) - parseFloat(price.amount)) / parseFloat(compareAt.amount)) * 100)
+    : 0;
+
+  const related = all
+    .filter((p) => p.node.handle !== product.handle && p.node.productType === product.productType)
+    .slice(0, 3);
+  const finalRelated = related.length >= 3
+    ? related
+    : [...related, ...all.filter((p) => p.node.handle !== product.handle && !related.includes(p))].slice(0, 3);
+
+  const handleAdd = async () => {
+    if (!variant) return;
+    setAdding(true);
+    await addItem({
+      variantId: variant.id,
+      productHandle: product.handle,
+      productTitle: product.title,
+      variantTitle: variant.title,
+      image: images[0]?.url ?? null,
+      price: variant.price,
+      quantity: qty,
+      selectedOptions: variant.selectedOptions || [],
+    });
+    setAdding(false);
+  };
 
   return (
-    <div className="container-x py-8 md:py-12">
-      {/* Breadcrumb */}
-      <nav className="flex items-center gap-1.5 text-xs text-muted-foreground">
+    <div className="container-x py-6 md:py-12">
+      <nav className="flex items-center gap-1.5 text-xs text-muted-foreground overflow-hidden">
         <Link to="/" className="hover:text-primary">Accueil</Link>
         <ChevronRight size={12} />
         <Link to="/boutique" className="hover:text-primary">Boutique</Link>
         <ChevronRight size={12} />
-        <span className="text-foreground">{product.name}</span>
+        <span className="truncate text-foreground">{product.title}</span>
       </nav>
 
-      <div className="mt-6 grid gap-10 lg:grid-cols-2">
-        {/* Gallery */}
+      <div className="mt-6 grid gap-8 lg:grid-cols-2 lg:gap-14">
         <div>
           <div className="overflow-hidden rounded-3xl bg-muted">
-            <img src={activeImg} alt={product.name} className="aspect-square w-full object-cover" />
+            {activeImg && <img src={activeImg} alt={product.title} className="aspect-square w-full object-cover" />}
           </div>
-          <div className="mt-4 grid grid-cols-4 gap-3">
-            {product.images.map((img) => (
-              <button
-                key={img}
-                onClick={() => setActiveImg(img)}
-                className={`overflow-hidden rounded-xl border-2 ${activeImg === img ? "border-primary" : "border-transparent"}`}
-              >
-                <img src={img} alt="" className="aspect-square w-full object-cover" />
-              </button>
-            ))}
-          </div>
+          {images.length > 1 && (
+            <div className="mt-4 grid grid-cols-4 gap-3">
+              {images.map((img) => (
+                <button
+                  key={img.url}
+                  onClick={() => setActiveImg(img.url)}
+                  className={`overflow-hidden rounded-xl border-2 transition ${
+                    activeImg === img.url ? "border-primary" : "border-transparent hover:border-border"
+                  }`}
+                >
+                  <img src={img.url} alt={img.altText ?? ""} className="aspect-square w-full object-cover" />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
-        {/* Info */}
         <div className="lg:pl-4">
-          <div className="text-xs uppercase tracking-wider text-primary">{product.category}</div>
-          <h1 className="mt-2 text-3xl md:text-5xl">{product.name}</h1>
-
-          <div className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
-            <div className="flex">{Array.from({ length: 5 }).map((_, i) => <Star key={i} size={14} className={i < Math.round(product.rating) ? "fill-gold text-gold" : "text-muted"} />)}</div>
-            <span>{product.rating}</span>
-            <span>·</span>
-            <span>{product.reviews} avis vérifiés</span>
-          </div>
+          <div className="text-[11px] uppercase tracking-[0.16em] text-primary">{product.productType}</div>
+          <h1 className="mt-2 font-display text-3xl leading-tight md:text-5xl">{product.title}</h1>
 
           <div className="mt-5 flex items-baseline gap-3">
-            <span className="text-3xl font-semibold">{product.price}€</span>
-            <span className="text-lg text-muted-foreground line-through">{product.oldPrice}€</span>
-            {discount > 0 && <span className="rounded-full bg-gold px-2 py-0.5 text-xs font-semibold text-gold-foreground">-{discount}%</span>}
+            <span className="text-3xl font-semibold">{formatPrice(price.amount, price.currencyCode)}</span>
+            {compareAt && parseFloat(compareAt.amount) > parseFloat(price.amount) && (
+              <>
+                <span className="text-lg text-muted-foreground line-through">
+                  {formatPrice(compareAt.amount, compareAt.currencyCode)}
+                </span>
+                <span className="rounded-full bg-gold px-2 py-0.5 text-xs font-semibold text-gold-foreground">
+                  -{discount}%
+                </span>
+              </>
+            )}
           </div>
 
-          <p className="mt-5 text-muted-foreground">{product.description}</p>
+          <p className="mt-5 text-muted-foreground leading-relaxed">{product.description}</p>
 
-          <ul className="mt-6 space-y-2">
-            {product.benefits.map((b) => (
-              <li key={b} className="flex items-center gap-2 text-sm">
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary/10 text-primary"><Check size={12} /></span>
-                {b}
-              </li>
-            ))}
-          </ul>
+          {product.tags.length > 0 && (
+            <ul className="mt-6 grid gap-2 sm:grid-cols-2">
+              {product.tags.slice(0, 4).map((t) => (
+                <li key={t} className="flex items-center gap-2 text-sm capitalize">
+                  <span className="grid h-5 w-5 place-items-center rounded-full bg-primary/10 text-primary">
+                    <Check size={12} />
+                  </span>
+                  {t}
+                </li>
+              ))}
+            </ul>
+          )}
 
-          {/* Quantity + add */}
           <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
-            <div className="inline-flex items-center rounded-full border">
-              <button onClick={() => setQty((q) => Math.max(1, q - 1))} className="p-3"><Minus size={14} /></button>
+            <div className="inline-flex items-center self-start rounded-full border">
+              <button onClick={() => setQty((q) => Math.max(1, q - 1))} className="p-3" aria-label="-"><Minus size={14} /></button>
               <span className="w-10 text-center font-medium">{qty}</span>
-              <button onClick={() => setQty((q) => q + 1)} className="p-3"><Plus size={14} /></button>
+              <button onClick={() => setQty((q) => q + 1)} className="p-3" aria-label="+"><Plus size={14} /></button>
             </div>
-            <button onClick={() => addItem(product, qty)} className="btn-primary flex-1 sm:flex-none">Ajouter au panier — {(product.price * qty).toFixed(0)}€</button>
-          </div>
-
-          {/* SHOPIFY BUY BUTTON ZONE
-            To connect this product to Shopify:
-            1. In Shopify Admin → Sales Channels → Buy Button
-            2. Create a Buy Button for this product
-            3. Copy the embed script generated by Shopify
-            4. Replace the div below with the embed code
-            Shopify checkout fallback URL:
-            https://zenflow.myshopify.com/products/{product.slug}
-          */}
-          <div className="mt-6">
-            <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Shopify Buy Button</div>
-            <div id={`shopify-buy-btn-${product.shopifyEmbedId}`} className="shopify-embed-zone my-2">
-              Zone d'intégration Shopify Buy Button — remplacez cette div par le script généré dans Shopify Admin.
-            </div>
-            <a
-              href={`https://zenflow.myshopify.com/products/${product.slug}`}
-              className="btn-primary w-full text-center mt-3"
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              onClick={handleAdd}
+              disabled={adding || !variant?.availableForSale}
+              className="btn-primary flex-1 disabled:opacity-60"
             >
-              Acheter sur Shopify →
-            </a>
+              {adding ? <Loader2 size={16} className="animate-spin" /> : (
+                <>Ajouter au panier — {formatPrice(String(parseFloat(price.amount) * qty), price.currencyCode)}</>
+              )}
+            </button>
           </div>
 
-          <div className="mt-6 grid grid-cols-2 gap-3 rounded-2xl border bg-card p-4 text-sm">
+          <div className="mt-6 grid grid-cols-1 gap-3 rounded-2xl border bg-card p-4 text-sm sm:grid-cols-2">
             <div className="flex items-center gap-2"><Truck size={16} className="text-primary" /> Livraison 48-72h</div>
-            <div className="flex items-center gap-2"><ShieldCheck size={16} className="text-primary" /> Retour 30j</div>
+            <div className="flex items-center gap-2"><ShieldCheck size={16} className="text-primary" /> Satisfait ou remboursé 30j</div>
           </div>
 
-          {/* Tabs */}
           <div className="mt-10 border-t pt-6">
             <div className="flex gap-6 border-b text-sm">
-              {[
+              {([
                 { k: "desc", l: "Description" },
-                { k: "spec", l: "Caractéristiques" },
                 { k: "ship", l: "Livraison & retours" },
-              ].map((t) => (
+              ] as const).map((t) => (
                 <button
                   key={t.k}
-                  onClick={() => setTab(t.k as typeof tab)}
-                  className={`-mb-px border-b-2 px-1 py-3 ${tab === t.k ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"}`}
+                  onClick={() => setTab(t.k)}
+                  className={`-mb-px border-b-2 px-1 py-3 transition ${
+                    tab === t.k ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
+                  }`}
                 >
                   {t.l}
                 </button>
               ))}
             </div>
-            <div className="py-5 text-sm text-muted-foreground leading-relaxed">
+            <div className="py-5 text-sm leading-relaxed text-muted-foreground">
               {tab === "desc" && <p>{product.description}</p>}
-              {tab === "spec" && (
-                <ul className="space-y-2">
-                  {product.benefits.map((b) => <li key={b}>• {b}</li>)}
-                </ul>
-              )}
               {tab === "ship" && (
                 <div className="space-y-2">
                   <p>Livraison gratuite en France métropolitaine dès 50€ d'achat. Sinon 4,90€.</p>
@@ -178,13 +194,14 @@ function ProductDetail() {
         </div>
       </div>
 
-      {/* Related */}
-      <section className="mt-20">
-        <h2 className="text-2xl md:text-3xl">Vous aimerez aussi</h2>
-        <div className="mt-8 grid grid-cols-1 gap-x-5 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-          {fallbackRelated.map((p) => <ProductCard key={p.id} product={p} />)}
-        </div>
-      </section>
+      {finalRelated.length > 0 && (
+        <section className="mt-20">
+          <h2 className="font-display text-2xl md:text-3xl">Vous aimerez aussi</h2>
+          <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3">
+            {finalRelated.map((p) => <ProductCard key={p.node.id} product={p} />)}
+          </div>
+        </section>
+      )}
     </div>
   );
 }
