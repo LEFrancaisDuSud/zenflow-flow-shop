@@ -65,7 +65,7 @@ function Contact() {
             <div className="mt-3 space-y-3 text-sm">
               <div>
                 <p className="font-medium">Quels délais de livraison ?</p>
-                <p className="text-muted-foreground">48 à 72h en France métropolitaine.</p>
+                <p className="text-muted-foreground">4 à 10 jours dans le monde entier.</p>
               </div>
               <div>
                 <p className="font-medium">Puis-je retourner un produit ?</p>
