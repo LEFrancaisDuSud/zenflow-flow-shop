@@ -144,7 +144,7 @@ function Home() {
               {[
                 { i: Leaf, t: "Matériaux durables" },
                 { i: ShieldCheck, t: "Testés en France" },
-                { i: Truck, t: "Expédition 24h" },
+                { i: Truck, t: "Livraison 4-10 jours" },
                 { i: Headphones, t: "Support humain" },
               ].map(({ i: Icon, t }) => (
                 <li key={t} className="flex items-center gap-2 text-sm">
