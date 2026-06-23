@@ -20,7 +20,7 @@ function Page() {
 
         <div className="mt-10 grid gap-5 sm:grid-cols-3">
           {[
-            { i: Truck, t: "Livraison 48-72h", d: "France métropolitaine" },
+            { i: Truck, t: "Livraison 4 à 10 jours", d: "Monde Entier" },
             { i: Package, t: "Offerte dès 50€", d: "4,90€ en dessous" },
             { i: RefreshCw, t: "Retour 30 jours", d: "Satisfait ou remboursé" },
           ].map(({ i: Icon, t, d }) => (
@@ -36,7 +36,7 @@ function Page() {
           <section>
             <h2 className="font-display text-2xl text-foreground">Modes de livraison</h2>
             <ul className="mt-3 space-y-2">
-              <li>• <strong className="text-foreground">Colissimo Domicile</strong> — 4,90€, 48-72h, gratuit dès 50€.</li>
+              <li>• <strong className="text-foreground">Colissimo Domicile</strong> — 4,90€, 4 à 10 jours, gratuit dès 50€.</li>
               <li>• <strong className="text-foreground">Mondial Relay</strong> — 3,90€, 3-5j ouvrés.</li>
               <li>• <strong className="text-foreground">Express Chronopost</strong> — 9,90€, livraison J+1 avant 13h.</li>
             </ul>
