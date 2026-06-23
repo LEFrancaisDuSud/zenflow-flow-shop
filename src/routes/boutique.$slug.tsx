@@ -42,6 +42,7 @@ function ProductDetail() {
   const variant = product.variants.edges[0]?.node;
   const images = product.images.edges.map((e) => e.node);
   const [activeImg, setActiveImg] = useState(images[0]?.url);
+  useEffect(() => { setActiveImg(images[0]?.url); }, [product.handle, images]);
   const [qty, setQty] = useState(1);
   const [adding, setAdding] = useState(false);
   const [tab, setTab] = useState<"desc" | "ship">("desc");
