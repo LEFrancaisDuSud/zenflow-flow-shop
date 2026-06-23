@@ -55,7 +55,7 @@ function Home() {
             <div className="flex">
               {Array.from({ length: 5 }).map((_, i) => <Star key={i} size={14} className="fill-gold text-gold" />)}
             </div>
-            <span>Marque française · Livraison rapide</span>
+            <span>Livraison soignée · Livraison rapide</span>
           </div>
         </div>
 
