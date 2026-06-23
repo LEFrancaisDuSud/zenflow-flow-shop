@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { useState } from "react";
-import { Check, ChevronRight, Loader2, Minus, Plus, ShieldCheck, Truck } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Check, ChevronRight, Flame, Loader2, Minus, Package, Plus, RotateCcw, ShieldCheck, Sparkles, Star, Truck } from "lucide-react";
 import { ProductCard } from "@/components/ProductCard";
 import { productByHandleQueryOptions, productsQueryOptions } from "@/lib/productQueries";
 import { useCartStore } from "@/stores/cartStore";
