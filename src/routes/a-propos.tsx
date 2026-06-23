@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Heart, Sparkles, Leaf } from "lucide-react";
+import brandHero from "@/assets/brand-hero.jpg";
 
 export const Route = createFileRoute("/a-propos")({
   head: () => ({
@@ -54,16 +55,19 @@ function About() {
 
       <section className="container-x py-16 md:py-24">
         <div className="grid items-center gap-10 md:grid-cols-2">
-          <div className="overflow-hidden rounded-3xl">
-            <img src="https://images.unsplash.com/photo-1521146764736-56c929d59c83?w=1200&q=80" alt="Fondateur ZenFlow" className="aspect-[4/5] w-full object-cover" />
+          <div className="relative overflow-hidden rounded-3xl">
+            <img src={brandHero} alt="L'univers ZenFlow" className="aspect-[4/5] w-full object-cover" loading="lazy" />
+            <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent" />
           </div>
           <div>
-            <div className="text-xs uppercase tracking-wider text-primary">Le fondateur</div>
-            <h2 className="mt-3 text-3xl md:text-5xl">"Je voulais ce que j'aurais aimé trouver."</h2>
+            <div className="text-xs uppercase tracking-wider text-primary">L'esprit ZenFlow</div>
+            <h2 className="mt-3 text-3xl md:text-5xl">Un rituel, pas un gadget.</h2>
             <p className="mt-5 text-muted-foreground">
-              Après dix ans dans la tech parisienne et des cervicales en compote, j'ai cherché des produits qui marchent vraiment. La plupart étaient soit hors de prix, soit du bricolage. ZenFlow, c'est l'entre-deux : du sérieux, du soigné, à prix juste.
+              Chaque produit ZenFlow est pensé comme un objet de soin du quotidien : matériaux nobles, design épuré, gestes simples. On élimine le superflu pour ne garder que ce qui fonctionne vraiment — le geste, la chaleur, la pression, le souffle.
             </p>
-            <p className="mt-3 text-muted-foreground">— Théo, fondateur</p>
+            <p className="mt-3 text-muted-foreground">
+              Notre promesse : 10 minutes par jour pour retrouver un corps libre, une tête claire, et l'énergie d'avancer.
+            </p>
             <Link to="/boutique" className="btn-primary mt-7 inline-flex">Découvrir la collection</Link>
           </div>
         </div>
