@@ -181,7 +181,7 @@ function Home() {
         <div className="mt-12 grid gap-5 md:grid-cols-3">
           {[
             { n: "01", t: "Choisis ton outil", d: "Parcours notre sélection — cervical, lombaire, sport, sommeil." },
-            { n: "02", t: "Reçois en 48-72h", d: "Livraison soignée, gratuite dès 50€ partout en France." },
+            { n: "02", t: "Reçois en 4-10 jours", d: "Livraison soignée, gratuite dès 50€ partout en France." },
             { n: "03", t: "Ressens la différence", d: "Une routine de 10 min suffit pour libérer tensions et énergie." },
           ].map((s) => (
             <div key={s.n} className="rounded-2xl border bg-card p-7">
