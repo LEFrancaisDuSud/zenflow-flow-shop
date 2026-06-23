@@ -19,23 +19,23 @@ function Page() {
         <div className="mt-10 space-y-6 text-sm leading-relaxed text-muted-foreground">
           <section>
             <h2 className="font-medium text-foreground">Éditeur du site</h2>
-            <p className="mt-2">ZenFlow SAS — Capital social : 10 000€<br />Siège social : 12 rue de la Paix, 75002 Paris, France<br />RCS Paris : 920 000 000<br />SIRET : 920 000 000 00012<br />TVA intracommunautaire : FR12 920000000</p>
+            <p className="mt-2">Site édité par ZenFlow, marque française dédiée au bien-être et à la récupération.</p>
           </section>
           <section>
-            <h2 className="font-medium text-foreground">Directeur de la publication</h2>
-            <p className="mt-2">Léa Moreau, présidente</p>
-          </section>
-          <section>
-            <h2 className="font-medium text-foreground">Hébergement</h2>
-            <p className="mt-2">Shopify Inc. — 151 O'Connor Street, Ottawa, Ontario, K2P 2L8, Canada</p>
+            <h2 className="font-medium text-foreground">Hébergement & paiement</h2>
+            <p className="mt-2">Ce site est hébergé et propulsé par Shopify Inc. — 151 O'Connor Street, Ottawa, Ontario, K2P 2L8, Canada. Les paiements sont sécurisés et traités par Shopify Payments.</p>
           </section>
           <section>
             <h2 className="font-medium text-foreground">Contact</h2>
-            <p className="mt-2">hello@zenflow.fr</p>
+            <p className="mt-2">Une question ? Écris-nous à hello@zenflow.fr — nous répondons sous 24h ouvrées.</p>
           </section>
           <section>
             <h2 className="font-medium text-foreground">Propriété intellectuelle</h2>
             <p className="mt-2">L'ensemble du contenu de ce site (textes, images, logos, vidéos) est protégé par le droit d'auteur. Toute reproduction non autorisée est interdite.</p>
+          </section>
+          <section>
+            <h2 className="font-medium text-foreground">Données personnelles</h2>
+            <p className="mt-2">Vos données sont traitées dans le respect du RGPD. Pour plus d'informations, consultez notre <a href="/confidentialite" className="text-primary hover:underline">politique de confidentialité</a>.</p>
           </section>
         </div>
       </div>
