@@ -13,7 +13,7 @@ export const Route = createFileRoute("/faq")({
 });
 
 const faqs = [
-  { q: "Combien de temps prend la livraison ?", a: "Vos commandes sont expédiées sous 24h ouvrées et livrées sous 4 à 10 jours en France métropolitaine via Colissimo ou Mondial Relay." },
+  { q: "Combien de temps prend la livraison ?", a: "Vos commandes sont expédiées sous 24h ouvrées et livrées sous 4 à 10 jours dans le monde entier." },
   { q: "La livraison est-elle gratuite ?", a: "Oui, dès 50€ d'achat en France métropolitaine. En dessous, la livraison standard est à 4,90€." },
   { q: "Quels sont les délais de retour ?", a: "Vous disposez de 30 jours pour nous retourner votre produit, dans son emballage d'origine, et être intégralement remboursé." },
   { q: "Les produits sont-ils garantis ?", a: "Tous nos appareils électriques bénéficient d'une garantie de 2 ans contre les défauts de fabrication." },
